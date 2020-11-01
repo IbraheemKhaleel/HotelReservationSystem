@@ -10,13 +10,15 @@ public class HotelInfos {
     private String typeOfCustomer;
     private Integer weekdayRate;
     private Integer weekendRate;
+    private Integer rating;
     public Integer totalCost;
 
-    public HotelInfos(String hotelName, String typeOfCustomer, Integer weekdayRate , Integer weekendRate) {
+    public HotelInfos(String hotelName, String typeOfCustomer, Integer weekdayRate , Integer weekendRate ,Integer rating) {
         this.hotelName = hotelName;
         this.typeOfCustomer = typeOfCustomer;
         this.weekdayRate = weekdayRate;
         this.weekendRate = weekendRate;
+        this.rating = rating;
     }
 
     public String getHotelName() {
@@ -38,8 +40,13 @@ public class HotelInfos {
     public Integer getTotalCost(){
         return totalCost;
     }
+
     public void setTotalCost(Integer totalCost){
         this.totalCost = totalCost;
+    }
+
+    public Integer getRating() {
+        return rating;
     }
 
     public Integer getTotalRate(LocalDate dateStart , LocalDate dateEnd , long difference) { //calculates total cost for hotel
