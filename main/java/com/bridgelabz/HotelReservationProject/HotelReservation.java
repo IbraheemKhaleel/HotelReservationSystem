@@ -1,6 +1,8 @@
 package com.bridgelabz.HotelReservationProject;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -8,49 +10,39 @@ import java.util.Optional;
 
 public class HotelReservation  {
 
-    HotelInfos addHotel(String name , String type , int weekday) {
-        return new HotelInfos(name , type , weekday);
+    HotelInfos addHotel(String name , String type , int weekday , int weekend) {
+        return new HotelInfos(name , type , weekday ,weekend);
     }
-    public Result findCheapestHotel(ArrayList<HotelInfos> hotelArray , String dateStarting , String dateEnding) {
-        int daysInBetween = getDaysInBetween(dateStarting , dateEnding);
-        Result cheapestHotel = getCheapestHotel(daysInBetween , hotelArray);
-        System.out.println("Hotel Name: " + cheapestHotel.getHotelName() + " Total Rate is: " + cheapestHotel.getTotalCost());
-        return cheapestHotel;
-    }
+    public Result findCheapestHotel(ArrayList<HotelInfos> hotelArray , String dateS , String dateE) {  //gets total cost for each hotel and returns cheapest hotel
 
-    private static int getDaysInBetween(String dateStarting , String dateEnding){
+        Integer cost;
+        LocalDate dateStart = null , dateEnd = null;
 
-        SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyy");
-        Date dateStart = new Date();
         try {
-            dateStart = formatter.parse(dateStarting);
+            dateStart = LocalDate.parse(dateS);
         } catch (Exception e) {
-            //empty catch
+            System.out.println("Please enter proper starting date");
         }
-        Date dateEnd = new Date();
         try {
-            dateEnd = formatter.parse(dateEnding);
+            dateEnd = LocalDate.parse(dateE);
         } catch (Exception e) {
-            //empty catch
+            System.out.println("Please enter proper ending date");
         }
+        long difference = Duration.between(dateStart.atStartOfDay() , dateEnd.atStartOfDay()).toDays();
 
-        long difference = dateEnd.getTime() - dateStart.getTime();
-        System.out.println(difference);
-        int daysInBetween = (int) Math.ceil(difference / (1000 * 60 * 60 * 24));
-        return daysInBetween;
+        for(HotelInfos hotelInfos : hotelArray) {
+            cost = hotelInfos.getTotalRate(dateStart, dateEnd, difference);
+            hotelInfos.setTotalCost(cost);
+        }
+        return this.getCheapestHotel(hotelArray);
     }
 
-    private static Result getCheapestHotel(int daysInBetween , ArrayList<HotelInfos> hotelArray) {
-        int currentHotelCost;
-        for (HotelInfos currentHotel : hotelArray) {     // set weekday cost for each hotel
-            currentHotelCost = daysInBetween * currentHotel.getWeekdayRate();
-            currentHotel.setCostWeekDay(currentHotelCost);
-        }
-        // Optional<Hotel>
-        Optional<HotelInfos> cheapestHotel = hotelArray.stream().min(Comparator.comparing(HotelInfos::getCostWeekday));
+    public Result getCheapestHotel(ArrayList<HotelInfos> hotelArray){ //compares total costs of hotels
+        Optional<HotelInfos> cheapestHotel = hotelArray.stream().min(Comparator.comparingInt(hotel -> hotel.getTotalCost()));
         Result result = new Result();
         result.setHotelName(cheapestHotel.get().getHotelName());
-        result.setTotalCost(cheapestHotel.get().getCostWeekday());
+        result.setTotalCost(cheapestHotel.get().getTotalCost());
+        System.out.println(result.getHotelName() + result.getTotalCost());
         return result;
     }
 
