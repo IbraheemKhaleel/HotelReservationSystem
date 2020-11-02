@@ -14,30 +14,27 @@ public class HotelReservation  {
         return new HotelInfos(name , type , weekday ,weekend, rating);
     }
     // method to find cheapest hotel in the basis of given date range
-    public Result findCheapestHotel(ArrayList<HotelInfos> hotelArray , String dateS , String dateE) {  //gets total cost for each hotel and returns cheapest hotel
+    public void setCost(ArrayList<HotelInfos> hotelArray , String startingDate , String endingDate) {
 
         Integer cost;
         LocalDate dateStart = null , dateEnd = null;
 
         try {
-            dateStart = LocalDate.parse(dateS);
+            dateStart = LocalDate.parse(startingDate);
         } catch (Exception e) {
             System.out.println("Please enter proper starting date");
         }
         try {
-            dateEnd = LocalDate.parse(dateE);
+            dateEnd = LocalDate.parse(endingDate);
         } catch (Exception e) {
             System.out.println("Please enter proper ending date");
         }
         long difference = Duration.between(dateStart.atStartOfDay() , dateEnd.atStartOfDay()).toDays();
 
-        for(HotelInfos hotelInfos : hotelArray) {
-            cost = hotelInfos.getTotalRate(dateStart, dateEnd, difference);
-            hotelInfos.setTotalCost(cost);
+        for(HotelInfos hotel : hotelArray) {
+            cost = hotel.getTotalRate(dateStart, dateEnd, difference);
+            hotel.setTotalCost(cost);
         }
-        Result result = this.getCheapestHotel(hotelArray);
-        result = this.cheapestBestRatedHotel(hotelArray , result);
-        return result;
     }
     // method to get the cheapest hotel
     public Result getCheapestHotel(ArrayList<HotelInfos> hotelArray){ //compares total costs of hotels
@@ -59,6 +56,17 @@ public class HotelReservation  {
                 result.setTotalCost(hotel.getTotalCost());
             }
         }
+        return result;
+    }
+
+    public Result findBestRatedHotel(ArrayList<HotelInfos> hotelArray , String dateS , String dateE) { //returns best rated hotel for a date range
+
+        Result result = new Result();
+        this.setCost(hotelArray , dateS , dateE);
+        Optional<HotelInfos> maxRatingHotel = hotelArray.stream().max(Comparator.comparingInt(hotel -> hotel.getRating()));
+        result.setHotelName(maxRatingHotel.get().getHotelName());
+        result.setTotalCost(maxRatingHotel.get().getTotalCost());
+        result.setRating(maxRatingHotel.get().getRating());
         return result;
     }
 
