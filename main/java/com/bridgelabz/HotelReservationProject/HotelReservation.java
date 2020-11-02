@@ -36,17 +36,19 @@ public class HotelReservation  {
             hotel.setTotalCost(cost);
         }
     }
-    // method to get the cheapest hotel
-    public Result getCheapestHotel(ArrayList<HotelInfos> hotelArray){ //compares total costs of hotels
+    public Result getCheapestHotel(ArrayList<HotelInfos> hotelArray , String dateS , String dateE){
+
+        this.setCost(hotelArray , dateS , dateE);
         Optional<HotelInfos> cheapestHotel = hotelArray.stream().min(Comparator.comparingInt(hotel -> hotel.getTotalCost()));
         Result result = new Result();
         result.setHotelName(cheapestHotel.get().getHotelName());
         result.setTotalCost(cheapestHotel.get().getTotalCost());
-        System.out.println(result.getHotelName() + result.getTotalCost());
         return result;
     }
-    // method to get the cheapest and best rated hotel
-    public Result cheapestBestRatedHotel(ArrayList<HotelInfos> hotelArray , Result result) {
+
+    public Result findCheapestBestRatedHotel(ArrayList<HotelInfos> hotelArray , String dateS ,String dateE) {
+        Result result;
+        result = this.getCheapestHotel(hotelArray , dateS , dateE);
         Optional<HotelInfos> maxCostHotel = hotelArray.stream().max(Comparator.comparingInt(hotel -> hotel.getTotalCost()));
         Optional<HotelInfos> minRatingHotel = hotelArray.stream().min(Comparator.comparingInt(hotel -> hotel.getRating()));
         for (HotelInfos hotel : hotelArray) {
@@ -59,7 +61,7 @@ public class HotelReservation  {
         return result;
     }
 
-    public Result findBestRatedHotel(ArrayList<HotelInfos> hotelArray , String dateS , String dateE) { //returns best rated hotel for a date range
+    public Result findBestRatedHotel(ArrayList<HotelInfos> hotelArray , String dateS , String dateE) {
 
         Result result = new Result();
         this.setCost(hotelArray , dateS , dateE);
@@ -69,5 +71,5 @@ public class HotelReservation  {
         result.setRating(maxRatingHotel.get().getRating());
         return result;
     }
-
 }
+
